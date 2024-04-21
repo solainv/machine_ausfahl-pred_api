@@ -1,0 +1,7 @@
+fastapi==0.110.0
+uvicorn== 0.29.0
+numpy==1.26.3
+scikit-learn==1.2.2
+xgboost==2.0.3
+pandas
+pickle
