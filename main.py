@@ -58,11 +58,20 @@ def predict_failure(user_input: MachineInput):
             'type_num': type_num
         }
         df = pd.DataFrame([numerical_features])
-        numerical_features_scaled = scaler.transform(df)
+        numerical_features_scaled = scaler.transform(df.values.reshape(1, -1))
+
         
         failure_prediction = ausfall_model.predict(numerical_features_scaled)[0]    
-        return {"prediction": "Es gibt eine Störung an Ihrer Maschine" if failure_prediction == 1 else "Ihre Maschine ist weiterhin einwandfrei in Betrieb."}
+        pred_prob = ausfall_model.predict_proba(numerical_features_scaled)[0]
+
+        predicted_class_prob = round(pred_prob[failure_prediction]*100, 2)
+        return {"prediction": f"Es gibt eine Störung an Ihrer Maschine und die Wahrscheinlichkeit dafür ist {predicted_class_prob}%" 
+                if failure_prediction == 1 
+                else f"Ihre Maschine ist weiterhin einwandfrei in Betrieb und die Wahrscheinlichkeit dafür ist {predicted_class_prob}%"}
     
     except ValueError as e:
-        print("Error:", e)
+        print("ValueError:", e)
         return {"error": str(e)}
+    except Exception as e:
+        print("Error:", e)
+        return {"error": "Ein unerwarteter Fehler ist aufgetreten."}
